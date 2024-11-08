@@ -2,107 +2,124 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WarehouseApp {
-    // Базовый класс, описывающий объект на складе
-    public abstract class WarehouseObject {
-        public Guid ID { get; } = Guid.NewGuid();
-        public double Width { get; set; }
-        public double Height { get; set; }
-        public double Depth { get; set; }
-        public virtual double Weight { get; set; }
+public abstract class WarehouseItem {
+    public string Id { get; set; }
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public double Depth { get; set; }
+    public double Weight { get; set; }
 
-        public abstract double CalculateVolume();
+    public WarehouseItem(string id, double width, double height, double depth, double weight) {
+        Id = id;
+        Width = width;
+        Height = height;
+        Depth = depth;
+        Weight = weight;
     }
 
-    // Класс коробки
-    public class Box : WarehouseObject {
-        public DateTime? ExpirationDate { get; set; }
-        public DateTime? ProductionDate { get; set; }
+    public double CalculateVolume() {
+        return Width * Height * Depth;
+    }
 
-        public override double CalculateVolume() {
-            return Width * Height * Depth;
-        }
+    public abstract void DisplayInfo();
+}
 
-        public DateTime GetExpirationDate() {
-            return ExpirationDate ?? ProductionDate?.AddDays(100) ?? throw new InvalidOperationException("Expiration or production date must be provided.");
+public class Box : WarehouseItem {
+    public DateTime? ExpiryDate { get; set; }
+    public DateTime? ProductionDate { get; set; }
+
+    public Box(string id, double width, double height, double depth, double weight, DateTime? productionDate = null, DateTime? expiryDate = null)
+        : base(id, width, height, depth, weight) {
+        if (productionDate.HasValue) {
+            ProductionDate = productionDate;
+            ExpiryDate = productionDate.Value.AddDays(100);
+        } else if (expiryDate.HasValue) {
+            ExpiryDate = expiryDate;
         }
     }
 
-    // Класс паллеты
-    public class Pallet : WarehouseObject {
-        public List<Box> Boxes { get; set; } = new List<Box>();
-
-        public override double CalculateVolume() {
-            double totalBoxVolume = Boxes.Sum(box => box.CalculateVolume());
-            double palletVolume = Width * Height * Depth;
-            return totalBoxVolume + palletVolume;
+    public override void DisplayInfo() {
+        Console.WriteLine($"Box - ID: {Id}, Dimensions (WxHxD): {Width}x{Height}x{Depth} cm, Weight: {Weight} kg, Volume: {CalculateVolume()} cm³");
+        if (ProductionDate.HasValue) {
+            Console.WriteLine($"  Production Date: {ProductionDate.Value:dd.MM.yyyy}");
         }
-
-        public DateTime? GetExpirationDate() {
-            if (!Boxes.Any())
-                return null;
-            return Boxes.Min(box => box.GetExpirationDate());
+        if (ExpiryDate.HasValue) {
+            Console.WriteLine($"  Expiry Date: {ExpiryDate.Value:dd.MM.yyyy}");
         }
+    }
+}
 
-        public override double Weight => Boxes.Sum(box => box.Weight) + 30;
+public class Pallet : WarehouseItem {
+    public List<Box> Boxes { get; set; }
+    public DateTime? ExpiryDate { get; private set; }
+
+    public Pallet(string id, double width, double height, double depth, double baseWeight = 30)
+        : base(id, width, height, depth, baseWeight) {
+        Boxes = new List<Box>();
     }
 
-    // Основное приложение
-    public class Program {
-        public static List<Pallet> GeneratePallets() {
-            var pallets = new List<Pallet>();
-            for (int i = 0; i < 5; i++) {
-                var pallet = new Pallet {
-                    Width = 120,
-                    Height = 100,
-                    Depth = 100
-                };
-
-                // Добавляем коробки на паллету
-                for (int j = 0; j < 3; j++) {
-                    pallet.Boxes.Add(new Box {
-                        Width = 30,
-                        Height = 30,
-                        Depth = 30,
-                        Weight = 10,
-                        ProductionDate = DateTime.Now.AddDays(-j * 20) // Пример установки даты производства
-                    });
-                }
-
-                pallets.Add(pallet);
-            }
-
-            return pallets;
+    public void AddBox(Box box) {
+        // Проверка, что коробка не превышает размеры паллеты по ширине и глубине
+        if (box.Width > Width || box.Depth > Depth) {
+            throw new InvalidOperationException($"Box {box.Id} exceeds pallet dimensions (Width: {box.Width} > {Width} or Depth: {box.Depth} > {Depth}).");
         }
 
-        public static void Main(string[] args) {
-            var pallets = GeneratePallets();
+        Boxes.Add(box);
+        RecalculateWeight();
+        UpdateExpiryDate();
+    }
 
-            // Группировка паллет по сроку годности, сортировка
-            var groupedPallets = pallets
-                .OrderBy(p => p.GetExpirationDate())
-                .ThenBy(p => p.Weight)
-                .GroupBy(p => p.GetExpirationDate());
+    private void RecalculateWeight() {
+        // Вес паллеты = суммарный вес коробок + 30 кг
+        Weight = Boxes.Sum(box => box.Weight) + 30;
+    }
 
-            Console.WriteLine("Группировка паллет по сроку годности:");
-            foreach (var group in groupedPallets) {
-                Console.WriteLine($"Срок годности: {group.Key?.ToShortDateString() ?? "Не указан"}");
-                foreach (var pallet in group) {
-                    Console.WriteLine($"  - Вес паллеты: {pallet.Weight} кг");
-                }
-            }
+    private void UpdateExpiryDate() {
+        // Срок годности паллеты равен минимальному сроку годности из коробок
+        ExpiryDate = Boxes
+            .Where(box => box.ExpiryDate.HasValue)
+            .Select(box => box.ExpiryDate.Value)
+            .DefaultIfEmpty()
+            .Min();
+    }
 
-            // Три паллеты с коробками с наибольшим сроком годности, отсортированные по объему
-            var topPallets = pallets
-                .OrderByDescending(p => p.Boxes.Max(b => b.GetExpirationDate()))
-                .ThenBy(p => p.CalculateVolume())
-                .Take(3);
+    public double CalculateTotalVolume() {
+        // Объем паллеты = объем всех коробок + собственный объем паллеты
+        double totalBoxVolume = Boxes.Sum(box => box.CalculateVolume());
+        return totalBoxVolume + CalculateVolume();
+    }
 
-            Console.WriteLine("\nТри паллеты с наибольшим сроком годности:");
-            foreach (var pallet in topPallets) {
-                Console.WriteLine($"- Объем паллеты: {pallet.CalculateVolume()}, Срок годности коробок: {pallet.Boxes.Max(b => (DateTime?)b.GetExpirationDate())?.ToShortDateString()}");
-
-            }
+    public override void DisplayInfo() {
+        Console.WriteLine($"Pallet - ID: {Id}, Dimensions (WxHxD): {Width}x{Height}x{Depth} cm, Weight: {Weight} kg, Volume: {CalculateTotalVolume()} cm³, Contains {Boxes.Count} box(es)");
+        if (ExpiryDate.HasValue) {
+            Console.WriteLine($"  Pallet Expiry Date: {ExpiryDate.Value:dd.MM.yyyy}");
         }
+        foreach (var box in Boxes) {
+            box.DisplayInfo();
+        }
+    }
+}
+
+// Пример использования
+public class Program {
+    public static void Main(string[] args) {
+        Box box1 = new Box("B1", 30, 20, 10, 5, productionDate: new DateTime(2023, 1, 1));
+        Box box2 = new Box("B2", 40, 30, 20, 7, expiryDate: new DateTime(2024, 2, 1));
+        Box box3 = new Box("B3", 25, 15, 12, 4, expiryDate: new DateTime(2023, 12, 15));
+
+        Pallet pallet = new Pallet("P1", 120, 100, 15);
+
+        try {
+            pallet.AddBox(box1);
+            pallet.AddBox(box2);
+            pallet.AddBox(box3);
+            pallet.DisplayInfo();
+        } catch (InvalidOperationException ex) {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Console.WriteLine("\nНажмите любую клавишу для выхода...");
+        Console.ReadKey();
+
     }
 }
