@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3156A405-FC31-4399-B437-C2395E6D568C}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>testing_monopoly</RootNamespace>
+    <RootNamespace>testing-monopoly</RootNamespace>
     <AssemblyName>testing-monopoly</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -68,9 +68,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Class.cs" />
+    <Compile Include="Models\Box.cs" />
+    <Compile Include="Services\Abstractions\IDisplayService.cs" />
+    <Compile Include="Services\Abstractions\IInputService.cs" />
+    <Compile Include="Services\ConsoleDisplayService.cs" />
+    <Compile Include="Services\ConsoleInputService.cs" />
+    <Compile Include="Models\Pallet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\WarehouseItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

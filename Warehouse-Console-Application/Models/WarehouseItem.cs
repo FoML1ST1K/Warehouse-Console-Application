@@ -23,18 +23,18 @@ public abstract class WarehouseItem {
     public abstract void DisplayInfo();
 }
 
-public class Box : WarehouseItem {
+/*public class Box : WarehouseItem {
     public DateTime? ExpiryDate { get; private set; }
     public DateTime? ProductionDate { get; private set; }
 
-    // Конструктор для Box с параметрами (ID, ширина, высота, глубина, вес, дата производства)
+    /// Конструктор для Box с параметрами (ID, ширина, высота, глубина, вес, дата производства)
     public Box(string id, double width, double height, double depth, double weight, DateTime productionDate)
         : base(id, width, height, depth, weight) {
         ProductionDate = productionDate;
         ExpiryDate = productionDate.AddDays(100); // Срок годности = 100 дней от даты производства
     }
 
-    // Конструктор для Box с параметрами (ID, ширина, высота, глубина, вес, срок годности)
+    /// Конструктор для Box с параметрами (ID, ширина, высота, глубина, вес, срок годности)
     public Box(string id, double width, double height, double depth, double weight, DateTime? expiryDate)
         : base(id, width, height, depth, weight) {
         ExpiryDate = expiryDate;
@@ -45,9 +45,9 @@ public class Box : WarehouseItem {
         if (ProductionDate.HasValue) Console.WriteLine($"  Дата производства: {ProductionDate:dd.MM.yyyy}");
         if (ExpiryDate.HasValue) Console.WriteLine($"  Срок годности: {ExpiryDate:dd.MM.yyyy}");
     }
-}
+}*/
 
-public class Pallet : WarehouseItem {
+/*public class Pallet : WarehouseItem {
     public List<Box> Boxes { get; }
     public DateTime? ExpiryDate { get; private set; }
 
@@ -80,10 +80,10 @@ public class Pallet : WarehouseItem {
         if (ExpiryDate.HasValue) Console.WriteLine($"  Срок годности паллеты: {ExpiryDate:dd.MM.yyyy}");
         foreach (var box in Boxes) box.DisplayInfo();
     }
-}
+}*/
 
 // Services
-public interface IInputService {
+/*public interface IInputService {
     List<Pallet> CollectPalletData();
 }
 
@@ -155,9 +155,9 @@ public class ConsoleInputService : IInputService {
 public interface IDisplayService {
     void DisplayPalletsGroupedByExpiryDate(List<Pallet> pallets);
     void DisplayTop3PalletsWithMaxExpiryDate(List<Pallet> pallets);
-}
+}*/
 
-public class ConsoleDisplayService : IDisplayService {
+/*public class ConsoleDisplayService : IDisplayService {
     public void DisplayPalletsGroupedByExpiryDate(List<Pallet> pallets) {
         var groupedPallets = pallets
             .OrderBy(p => p.ExpiryDate)
@@ -181,6 +181,6 @@ public class ConsoleDisplayService : IDisplayService {
         Console.WriteLine("\n3 паллеты с коробками с наибольшим сроком годности:");
         foreach (var pallet in palletsWithMaxExpiry) pallet.DisplayInfo();
     }
-}
+}*/
 
 
