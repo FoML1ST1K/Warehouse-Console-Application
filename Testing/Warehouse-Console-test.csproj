@@ -53,12 +53,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\testing-monopoly\testing-monopoly.csproj">
+    <ProjectReference Include="..\testing-monopoly\Warehouse-Console.csproj">
       <Project>{3156a405-fc31-4399-b437-c2395e6d568c}</Project>
-      <Name>testing-monopoly</Name>
+      <Name>Warehouse-Console</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

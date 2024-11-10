@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testing-monopoly", "testing-monopoly\testing-monopoly.csproj", "{3156A405-FC31-4399-B437-C2395E6D568C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse-Console", "testing-monopoly\Warehouse-Console.csproj", "{3156A405-FC31-4399-B437-C2395E6D568C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{2A4774A1-2DBF-407A-A163-C18B4159833D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse-Console-test", "Testing\Warehouse-Console-test.csproj", "{2A4774A1-2DBF-407A-A163-C18B4159833D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
