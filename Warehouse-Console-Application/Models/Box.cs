@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 public class Box : WarehouseItem {
     public DateTime? ExpiryDate { get; private set; }
@@ -18,9 +19,15 @@ public class Box : WarehouseItem {
     }
 
     public override void DisplayInfo() {
-        Console.WriteLine($"Коробка - ID: {Id}, Размеры (ШxВxГ): {Width}x{Height}x{Depth} см, Вес: {Weight} кг, Объем: {CalculateVolume()} см");
-        if (ProductionDate.HasValue) Console.WriteLine($"  Дата производства: {ProductionDate:dd.MM.yyyy}");
-        if (ExpiryDate.HasValue) Console.WriteLine($"  Срок годности: {ExpiryDate:dd.MM.yyyy}");
+        var sb = new StringBuilder();
+        sb.AppendLine($"Коробка - ID: {Id}, Размеры (ШxВxГ): {Width}x{Height}x{Depth} см, Вес: {Weight} кг, Объем: {CalculateVolume()} см");
+        if (ProductionDate.HasValue)
+            sb.AppendLine($"  Дата производства: {ProductionDate:dd.MM.yyyy}");
+        if (ExpiryDate.HasValue)
+            sb.AppendLine($"  Срок годности: {ExpiryDate:dd.MM.yyyy}");
+
+        Console.WriteLine(sb.ToString());
     }
+
 }
 
